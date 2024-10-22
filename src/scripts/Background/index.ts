@@ -19,13 +19,19 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         const patterns = data.patterns as string[];
         const target = tab.url;
 
-        for (const pattern of patterns) {
-          if (target && new RegExp(pattern).test(target)) {
-            chrome.tabs.remove(tabId, function () {});
-            break;
+        // Check if the tab is in incognito mode
+        chrome.tabs.get(tabId, (tabInfo) => {
+          if (tabInfo.incognito) {
+            for (const pattern of patterns) {
+              if (target && new RegExp(pattern).test(target)) {
+                chrome.tabs.remove(tabId, function () { });
+                break;
+              }
+            }
           }
-        }
+        });
       }
     });
   }
 });
+
